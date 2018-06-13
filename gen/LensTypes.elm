@@ -1,4 +1,4 @@
-module LensTypes exposing (Accessor(Accessor), get)
+module LensTypes exposing (Accessor(Accessor), get, set, over)
 
 type Accessor super sub = 
   Accessor { get : super -> sub 
@@ -25,5 +25,15 @@ id =
 
 --get : ( Accessor a i -> Accessor b i) -> b -> i
 get lens s = 
-  let accessor = (lens id) in
+  let (Accessor accessor) = (lens id) in
   accessor.get s
+
+--set : ( Accessor a i -> Accessor b i) -> i -> b -> b
+set lens i s = 
+  let (Accessor accessor) = (lens id) in
+  accessor.over (\_ -> i) s
+
+--over : ( Accessor a i -> Accessor b i) -> (i -> i) -> b -> b
+over lens f s = 
+  let (Accessor accessor) = (lens id) in
+  accessor.over f s
