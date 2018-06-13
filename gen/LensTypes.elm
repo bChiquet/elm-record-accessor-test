@@ -59,7 +59,7 @@ The argument to function `lens` is causing a mismatch.
 -}
 --Apparently this error happens because of declaring declaring id. 
 
-id : z -> Accessor z z
+--id : z -> Accessor z z
 id = \z ->
   Accessor { get  = z
            , over = \f -> f z
@@ -68,16 +68,16 @@ id = \z ->
 --get : Lens s a -> s -> a
 --get : ((a -> Accessor a i) -> (b -> Accessor b i)) -> b -> i
 get lens s = 
-  let accessor = (lens id) in
+  let (Accessor accessor) = (lens id) s in
   accessor.get
 
 --set : Lens s a -> a -> s -> s
 set lens a s = 
-  let accessor = (lens id) in
-  accessor.over (\_ -> a) s
+  let (Accessor accessor) = (lens id) s in
+  accessor.over (\_ -> a)
 
 --over : Lens s a -> (a -> a) -> s -> s
 over lens f s =
-  let accessor = (lens id) in
-  accessor.over f s
+  let (Accessor accessor) = (lens id) s in
+  accessor.over f
 
