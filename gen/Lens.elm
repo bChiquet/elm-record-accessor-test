@@ -2,20 +2,19 @@ module Lens exposing (r)
 
 import LensTypes exposing (Accessor(..))
 
-
 r = {
     bar = \(Accessor sub) ->
-      Accessor { get  = \b -> sub.get b.bar
-               , over = \f -> \b -> { b | bar = sub.over f b.bar }
+      Accessor { get  = \super -> sub.get super.bar
+               , over = \f -> \super -> { super | bar = sub.over f super.bar }
                }
     ,
     foo = \(Accessor sub) ->
-      Accessor { get  = \b -> sub.get b.foo
-               , over = \f -> \b -> { b | foo = sub.over f b.foo}
+      Accessor { get  = \super -> sub.get super.foo
+               , over = \f -> \super -> { super | foo = sub.over f super.foo }
                }
     ,
     qux = \(Accessor sub) ->
-      Accessor { get  = \b -> sub.get b.qux
-               , over = \f -> \b -> { b | qux = sub.over f b.qux}
+      Accessor { get  = \super -> sub.get super.qux
+               , over = \f -> \super -> { super | qux = sub.over f super.qux }
                }
     }
