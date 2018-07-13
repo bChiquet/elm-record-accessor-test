@@ -3,12 +3,15 @@ module Spec exposing (suite)
 import Test exposing (Test, describe, test)
 import Expect
 import Main exposing (MyRecord(R))
-import LensTypes exposing (get, set, over)
+import LensTypes exposing (get, set, over, onEach, try)
 import Lens exposing (r)
 
 
 simpleRecord = {foo = 3, bar = "Yop", qux = False}
+anotherRecord = {foo = 5, bar = "Sup", qux = True}
 nestedRecord = {foo = simpleRecord}
+recordWithList = {bar = [simpleRecord, anotherRecord]}
+maybeRecord = {bar = Just simpleRecord, foo = Nothing}
 
 suite : Test
 suite =
@@ -22,6 +25,18 @@ suite =
           Expect.equal
             (get (r.foo << r.bar) nestedRecord)
             "Yop"
+      , test "get in list" <| \_ ->
+          Expect.equal 
+            (get (r.bar << onEach << r.foo) recordWithList)
+            [3, 5]
+      , test "get in Just" <| \_ ->
+          Expect.equal
+            (get (r.bar << try << r.qux) maybeRecord)
+            (Just False)
+      , test "get in Nothing" <| \_ ->
+          Expect.equal
+            (get (r.foo << try << r.bar) maybeRecord)
+            Nothing
       ]
     , describe "set"
       [ test "simple set" <| \_ ->
@@ -36,6 +51,24 @@ suite =
           in Expect.equal
             updatedExample.foo.foo
             5
+      , test "set in list" <| \_ -> 
+          let updatedExample = 
+            (set (r.bar << onEach << r.bar) "Why, hello" recordWithList)
+          in Expect.equal
+            (get (r.bar << onEach << r.bar) updatedExample)
+            ["Why, hello", "Why, hello"]
+      , test "set in Just" <| \_ ->
+          let updatedExample = 
+            (set (r.bar << try << r.foo) 4 maybeRecord)
+          in Expect.equal
+            (get (r.bar << try << r.foo) updatedExample)
+            (Just 4)
+      , test "set in Nothing" <| \_ ->
+          let updatedExample = 
+            (set (r.foo << try << r.bar) "Nope" maybeRecord)
+          in Expect.equal
+            (get (r.foo << try << r.bar) updatedExample)
+            Nothing
       ]
     , describe "over"
       [ test "simple over" <| \_ ->
@@ -50,5 +83,23 @@ suite =
           in Expect.equal
             updatedExample.foo.qux
             True
+      , test "over list" <| \_ -> 
+          let updatedExample = 
+            (over (r.bar << onEach << r.foo) (\n -> n-2) recordWithList)
+          in Expect.equal
+            (get (r.bar << onEach << r.foo) updatedExample)
+            [1, 3]
+      , test "over through Just" <| \_ ->
+          let updatedExample = 
+            (over (r.bar << try << r.foo) (\n -> n+3) maybeRecord)
+          in Expect.equal
+            (get (r.bar << try << r.foo) updatedExample)
+            (Just 6)
+      , test "over through Nothing" <| \_ ->
+          let updatedExample = 
+            (over (r.foo << try << r.bar) (\w -> w++"!") maybeRecord)
+          in Expect.equal
+            (get (r.foo << try << r.bar) updatedExample)
+            Nothing
       ]
     ]
