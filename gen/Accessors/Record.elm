@@ -1,6 +1,6 @@
-module Lens exposing (r)
+module Accessors.Record exposing (r)
 
-import LensTypes exposing (Accessor(..))
+import Accessors exposing (Accessor(..))
 
 r = {
     bar = \(Accessor sub) ->

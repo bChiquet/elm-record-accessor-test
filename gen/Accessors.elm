@@ -1,7 +1,5 @@
-module LensTypes exposing (Accessor(Accessor), get, set, over, onEach, try)
+module Accessors exposing (Accessor(Accessor), get, set, over, onEach, try)
 
-
---Result is introduced to account for wrappers e.g. List or Maybe 
 
 type Accessor super sub wrap = 
     Accessor { get : super -> wrap

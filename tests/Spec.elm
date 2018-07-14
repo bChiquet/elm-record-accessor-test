@@ -3,8 +3,8 @@ module Spec exposing (suite)
 import Test exposing (Test, describe, test)
 import Expect
 import Main exposing (MyRecord(R))
-import LensTypes exposing (get, set, over, onEach, try)
-import Lens exposing (r)
+import Accessors exposing (get, set, over, onEach, try)
+import Accessors.Record exposing (r)
 
 
 simpleRecord = {foo = 3, bar = "Yop", qux = False}
