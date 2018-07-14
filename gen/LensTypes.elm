@@ -8,46 +8,43 @@ type Accessor super sub wrap =
              , over : (sub -> sub) -> (super -> super) }
 
 
---fieldLens : Accessor a i -> Accessor {b | field : a} i
---fieldLens (Accessor sub) = 
---  Accessor { get  = \b -> sub.get b.field
---           , over = \change -> (\b -> {b | field = sub.over change b.field })
---           }
+exampleFieldLens : Accessor a b c -> Accessor {rec | field : a} b c
+exampleFieldLens (Accessor sub) = 
+  Accessor { get  = \super -> sub.get super.field
+           , over = \change -> 
+             (\super -> 
+               {super | field = sub.over change super.field }
+             )
+           }
 
---onEach : Accessor a i -> Accessor (List a) i
---onEach (Accessor sub) =
---  Accessor { get  = \b -> List.map sub.get b
---           , over = \change -> (\b -> List.map (sub.over change) b)
---           }
-
-
---id : Accessor z z
+id : Accessor a a a
 id =
   Accessor { get  = \a -> a
            , over = \change -> (\a -> change a)
            }
 
---get : ( Accessor a i -> Accessor b i) -> b -> i
+get : (Accessor a a a -> Accessor b a c) -> b -> c
 get lens s = 
   let (Accessor accessor) = (lens id) in
   accessor.get s
 
---set : ( Accessor a i -> Accessor b i) -> i -> b -> b
+set : (Accessor a a a -> Accessor b a c) -> a -> b -> b
 set lens i s = 
   let (Accessor accessor) = (lens id) in
   accessor.over (\_ -> i) s
 
---over : ( Accessor a i -> Accessor b i) -> (i -> i) -> b -> b
+over : (Accessor a a a -> Accessor b a c) -> (a -> a) -> b -> b
 over lens f s = 
   let (Accessor accessor) = (lens id) in
   accessor.over f s
 
---onEach : Accessor a i -> Accessor (List a) i
+onEach : Accessor a b c -> Accessor (List a) b (List c)
 onEach (Accessor sub) = 
   Accessor { get = \list -> List.map sub.get list
            , over = \f -> (\list -> List.map (sub.over f) list) }
 
 
+try : Accessor a b c -> Accessor (Maybe a) b (Maybe c)
 try (Accessor sub) =
   Accessor { get = \maybe -> case maybe of 
                       Just something -> Just (sub.get something)
